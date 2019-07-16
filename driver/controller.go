@@ -1,8 +1,9 @@
 package driver
 
 import (
-	"github.com/HFO4/gbc-in-cloud/util"
 	"time"
+
+	"github.com/HFO4/gbc-in-cloud/util"
 )
 
 type ControllerDriver interface {
@@ -40,7 +41,7 @@ func (tel *TelnetController) UpdateInput() bool {
 			If the key was pressed in 200ms,
 			We consider player "hold" the key.
 		*/
-		if timeNow-offset.LastPress <= 200 {
+		if timeNow-offset.LastPress <= 250 {
 			statusCopy = util.ClearBit(statusCopy, uint(key))
 			if timeNow-offset.LastChecked >= 100 {
 				requestInterrupt = true

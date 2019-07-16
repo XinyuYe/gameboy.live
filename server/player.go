@@ -2,12 +2,13 @@ package server
 
 import (
 	"fmt"
-	"github.com/HFO4/gbc-in-cloud/driver"
-	"github.com/HFO4/gbc-in-cloud/gb"
-	"github.com/logrusorgru/aurora"
 	"log"
 	"net"
 	"strconv"
+
+	"github.com/HFO4/gbc-in-cloud/driver"
+	"github.com/HFO4/gbc-in-cloud/gb"
+	"github.com/logrusorgru/aurora"
 )
 
 // Player Single player model
@@ -45,7 +46,7 @@ func (player *Player) Init() bool {
 		core := &gb.Core{
 			// Terminal gaming dose not require high FPS,
 			// 10 FPS is a decent choice in most situation.
-			FPS:           10,
+			FPS:           30,
 			Clock:         4194304,
 			Debug:         false,
 			DisplayDriver: Driver,
@@ -101,7 +102,7 @@ func (player *Player) Welcome() int {
 
 	for {
 		var n int
-		_, err = player.Conn.Write(player.RenderWelcomeScreen())
+		// _, err = player.Conn.Write(player.RenderWelcomeScreen())
 		buf := make([]byte, 512)
 		n, err = player.Conn.Read(buf)
 		inputKey := buf[:n]
@@ -271,19 +272,21 @@ func (player *Player) Logout() {
 
 func (player *Player) Serve() {
 
-	game := player.Welcome()
+	// game := player.Welcome()
+	player.Init()
+	// game := 0
 
-	if game < 0 {
-		log.Println("User quit")
-		player.Logout()
-		return
-	}
+	// if game < 0 {
+	// 	log.Println("User quit")
+	// 	player.Logout()
+	// 	return
+	// }
 
-	if player.Instruction() < 0 {
-		log.Println("User quit")
-		player.Logout()
-		return
-	}
+	// if player.Instruction() < 0 {
+	// 	log.Println("User quit")
+	// 	player.Logout()
+	// 	return
+	// }
 
 	// Set the display driver to TELNET
 	go player.Emulator.DisplayDriver.Run(player.Emulator.DrawSignal)
@@ -293,6 +296,8 @@ func (player *Player) Serve() {
 	for {
 		buf := make([]byte, 512)
 		n, err := player.Conn.Read(buf)
+		// log.Println("Buf Size: ", n)
+		// log.Println("Buf Content: ", buf)
 		if err != nil {
 			log.Println("Error reading", err.Error())
 			player.Emulator.Exit = true

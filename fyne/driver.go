@@ -67,6 +67,7 @@ func (lcd *LCD) draw(w, h int) image.Image {
 				lcd.screen.Pix[i+1] = 0x62
 				lcd.screen.Pix[i+2] = 0x30
 			} else {
+				// log.Println(r, g, b)
 				lcd.screen.Pix[i] = 0x0f
 				lcd.screen.Pix[i+1] = 0x38
 				lcd.screen.Pix[i+2] = 0x0f

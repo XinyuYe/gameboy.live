@@ -31,21 +31,47 @@ func (stream *ASCII) Run(drawSignal chan bool) {
 			break
 		}
 		stream.FrameCount++
-		pixels := [160][144]bool{}
+		stream.sendFrame()
+		// pixels := [160][144]bool{}
+		// for y := 0; y < 144; y++ {
+		// 	for x := 0; x < 160; x++ {
+		// 		switch stream.pixels[x][y][0] {
+		// 		case 255, 0xCC:
+		// 			// White pixel
+		// 			pixels[x][y] = true
+		// 		default:
+		// 			// Black pixel
+		// 			pixels[x][y] = false
+		// 		}
+		// 	}
+		// }
+		// stream.renderAscii(pixels)
+	}
+}
+
+func (stream *ASCII) sendFrame() {
+	// if stream.last == stream.pixels {
+	// 	return
+	// }
+	for x := 0; x < 160; x++ {
+		// data := [144]byte{}
+		data := make([]byte, 144)
 		for y := 0; y < 144; y++ {
-			for x := 0; x < 160; x++ {
-				switch stream.pixels[x][y][0] {
-				case 255, 0xCC:
-					// White pixel
-					pixels[x][y] = true
-				default:
-					// Black pixel
-					pixels[x][y] = false
-				}
+			switch stream.pixels[x][y][0] {
+			case 0xFF:
+				data[y] = 0
+			case 0xCC:
+				data[y] = 1
+			case 0x77:
+				data[y] = 2
+			default:
+				data[y] = 3
 			}
 		}
-		stream.renderAscii(pixels)
-
+		_, err := stream.Conn.Write(data)
+		if err != nil {
+			log.Println("Failed to send frame to player")
+		}
 	}
 }
 
@@ -74,6 +100,7 @@ func (stream *ASCII) renderAscii(pixels [160][144]bool) {
 	for y := 0; y < 144; y++ {
 		for x := 0; x < 160; x++ {
 			charPosition := int(math.Floor(float64(x)/2.0) + (math.Floor(float64(y)/4.0) * 80))
+			// log.Println("Pixel: ", pixels[x][y])
 			if pixels[x][y] {
 				chars[charPosition] |= pixelMap[y%4][x%2]
 			}
@@ -89,6 +116,8 @@ func (stream *ASCII) renderAscii(pixels [160][144]bool) {
 			}
 		}
 	}
+	// log.Println("Return size: ", len(ret))
+	// data :=
 	// Clean screen
 	_, err := stream.Conn.Write([]byte("\033[H" + ret))
 

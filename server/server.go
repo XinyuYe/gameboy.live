@@ -1,10 +1,11 @@
 package server
 
 import (
-	"github.com/satori/go.uuid"
 	"log"
 	"net"
 	"strconv"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 type StreamServer struct {
@@ -50,8 +51,8 @@ func (server *StreamServer) Run() {
 
 		PlayerList = append(PlayerList, player)
 
-		if player.InitTelnet() {
-			go player.Serve()
-		}
+		// if player.InitTelnet() {
+		go player.Serve()
+		// }
 	}
 }
